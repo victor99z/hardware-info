@@ -9,6 +9,16 @@ type url = {
   url: string;
 };
 
+const checkItems = (price: number, title: string) => {
+  if (price === undefined) {
+    log.error("Price is undefined");
+    throw new Error("Price is undefined");
+  }
+  if (title === undefined) {
+    log.error("Title is undefined");
+    throw new Error("Title is undefined");
+  }
+}
 
 (async () => {
   storage.dropTable();
@@ -47,15 +57,6 @@ type url = {
     if (item.url && item.url.includes("www.terabyteshop.com.br")) {
       try {
         let teraItems = await ScrapTera(item.url);
-
-        if (teraItems.price === undefined) {
-          log.error("Price is undefined");
-          throw new Error("Price is undefined");
-        }
-        if (teraItems.title === undefined) {
-          log.error("Title is undefined");
-          throw new Error("Title is undefined");
-        }
 
         storage.insertData(
           teraItems.price,
