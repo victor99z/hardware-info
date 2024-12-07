@@ -1,18 +1,13 @@
-import winston from 'winston';
+function parseCurrencyToNumber(currency: string): number {
+    // Step 1: Remove the currency symbol and any non-numeric characters
+    let numericString = currency.replace(/[^\d,]/g, '');
 
-const { combine, timestamp, printf } = winston.format;
+    // Step 2: Replace the comma with a dot
+    numericString = numericString.replace(',', '.');
 
-const logFormat = printf(({ level, message, timestamp }) => {
-    return `${timestamp} [${level}]: ${message}`;
-});
+    // Step 3: Convert the resulting string to a number
+    return parseFloat(numericString);
+}
 
-const log = winston.createLogger({
-    level: "info",
-    format: combine(
-        timestamp(),
-        logFormat
-    ),
-    transports: [new winston.transports.Console(), new winston.transports.File({ filename: "error.log" })],
-});
 
-export default log;
+export default parseCurrencyToNumber;

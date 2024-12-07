@@ -1,8 +1,9 @@
 import puppeteer from "puppeteer";
+import parseCurrencyToNumber from "./utils";
 
 async function ScrapKabum(url: string) {
   let title: string | undefined;
-  let price: string | undefined;
+  let price: number | undefined;
 
   const browser = await puppeteer.launch({
     headless: true,
@@ -43,8 +44,9 @@ async function ScrapKabum(url: string) {
       let val = await page.$$eval("h4.finalPrice", (elements) => {
         return elements.map((e) => e.textContent);
       });
-      price = val[0];
+      price = parseCurrencyToNumber(val[0]);
     });
+
     return { title, price };
   } catch (error) {
     console.error("Error scraping the page:", error);

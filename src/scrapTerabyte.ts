@@ -1,4 +1,5 @@
 import puppeteer from "puppeteer";
+import parseCurrencyToNumber from "./utils";
 
 async function ScrapTera(url: string) {
   let title: string | undefined;
@@ -49,17 +50,6 @@ async function ScrapTera(url: string) {
     await browser.close();
   }
   return { title, price };
-}
-
-function parseCurrencyToNumber(currency: string): number {
-  // Step 1: Remove the currency symbol and any non-numeric characters
-  let numericString = currency.replace(/[^\d,]/g, '');
-
-  // Step 2: Replace the comma with a dot
-  numericString = numericString.replace(',', '.');
-
-  // Step 3: Convert the resulting string to a number
-  return parseFloat(numericString);
 }
 
 export default ScrapTera

@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = __importDefault(require("puppeteer"));
+const utils_1 = __importDefault(require("./utils"));
 function ScrapKabum(url) {
     return __awaiter(this, void 0, void 0, function* () {
         let title;
@@ -48,7 +49,7 @@ function ScrapKabum(url) {
                 let val = yield page.$$eval("h4.finalPrice", (elements) => {
                     return elements.map((e) => e.textContent);
                 });
-                price = val[0];
+                price = (0, utils_1.default)(val[0]);
             }));
             return { title, price };
         }

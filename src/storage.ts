@@ -1,5 +1,5 @@
 import sqlite3 from "sqlite3";
-import log from "./utils";
+import log from "./logger";
 
 // Open the SQLite database
 
@@ -25,6 +25,7 @@ function createTable() {
         price REAL,
         title TEXT,
         loja TEXT,
+        url TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`;
   db.run(query, (err) => {
@@ -38,10 +39,10 @@ function createTable() {
 }
 
 // Define a function to insert price and title into the database
-function insertData(price: number, title: string, loja: string) {
+function insertData(price: number, title: string, loja: string, url: string) {
   const db = new sqlite3.Database("sqlite3.db");
-  const query = `INSERT INTO historico (price, title, loja) VALUES (?, ?, ?)`;
-  db.run(query, [price, title, loja], (err) => {
+  const query = `INSERT INTO historico (price, title, loja, url) VALUES (?, ?, ?, ?)`;
+  db.run(query, [price, title, loja, url], (err) => {
     if (err) {
       log.error("Error inserting data:", err);
     } else {

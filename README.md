@@ -1,5 +1,11 @@
 ## Projeto
 
+install packages
+    
+```bash
+pnpm install
+```
+
 dev run 
 
 ```bash

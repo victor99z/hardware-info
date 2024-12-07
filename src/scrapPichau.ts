@@ -1,8 +1,9 @@
 import puppeteer from "puppeteer";
+import parseCurrencyToNumber from "./utils";
 
 async function ScrapPichau(url: string) {
   let title: string | undefined;
-  let price: string | undefined;
+  let price: number | undefined;
 
   const browser = await puppeteer.launch({
     headless: true,
@@ -50,7 +51,7 @@ async function ScrapPichau(url: string) {
             return elements.map((e) => e.textContent);
           }
         );
-        price = val[0];
+        price = parseCurrencyToNumber(val[0]);
       });
     return { title, price };
   } catch (error) {

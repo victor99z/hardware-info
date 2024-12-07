@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = __importDefault(require("puppeteer"));
+const utils_1 = __importDefault(require("./utils"));
 function ScrapTera(url) {
     return __awaiter(this, void 0, void 0, function* () {
         let title;
@@ -44,7 +45,7 @@ function ScrapTera(url) {
             // Get the price of the product
             yield page.waitForSelector("p#valVista").then((res) => __awaiter(this, void 0, void 0, function* () {
                 const priceRes = yield (res === null || res === void 0 ? void 0 : res.evaluate((el) => el.textContent));
-                price = parseCurrencyToNumber(priceRes);
+                price = (0, utils_1.default)(priceRes);
             }));
             return { title, price };
         }
@@ -56,13 +57,5 @@ function ScrapTera(url) {
         }
         return { title, price };
     });
-}
-function parseCurrencyToNumber(currency) {
-    // Step 1: Remove the currency symbol and any non-numeric characters
-    let numericString = currency.replace(/[^\d,]/g, '');
-    // Step 2: Replace the comma with a dot
-    numericString = numericString.replace(',', '.');
-    // Step 3: Convert the resulting string to a number
-    return parseFloat(numericString);
 }
 exports.default = ScrapTera;
