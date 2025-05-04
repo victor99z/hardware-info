@@ -1,10 +1,12 @@
-import ScrapPichau from "./scrapPichau";
-import readCSV from "./readCSV";
-import storage from "./storage";
-import ScrapKabum from "./scrapKabum";
-import ScrapTera from "./scrapTerabyte";
-import log from "./logger";
-import cron from "node-cron";
+import readCSV from "./utils/read_csv";
+import log from "./config/logger";
+import storage from "./utils/storage";
+import ScrapPichau from "./scripts/pichau";
+import ScrapKabum from "./scripts/kabum";
+import ScrapTera from "./scripts/terabyte";
+import scrapAmazon from "./scripts/amazon";
+import express from 'express';
+import productRoutes from './routes/productRoutes';
 
 type url = {
   url: string;
@@ -36,12 +38,7 @@ const runScrap = async (url: string, scrapFunction: () => Promise<any>) => {
       store[0].toString(),
       url
     );
-    log.info({
-      price: items.price,
-      title: items.title,
-      store: store[0].toString(),
-      url: url
-    });
+    log.info(`Data inserted successfully for ${url}`);
   } catch (e) {
     log.error(e);
   }
@@ -52,15 +49,19 @@ const filterByStore = async (url: string) => {
     log.error("URL is empty");
     throw new Error("URL is empty");
   }
-  if (url.includes("www.terabyteshop.com.br")) {
-    runScrap(url, () => ScrapTera(url));
-  }
+  // if (url.includes("www.terabyteshop.com.br")) {
+  //   runScrap(url, () => ScrapTera(url));
+  // }
   if (url.includes("www.pichau.com.br")) {
     runScrap(url, () => ScrapPichau(url));
   }
-  if (url.includes("www.kabum.com.br")) {
-    runScrap(url, () => ScrapKabum(url));
-  }
+  // if (url.includes("www.kabum.com.br")) {
+  //   runScrap(url, () => ScrapKabum(url));
+  // }
+  // if (url.includes("www.amazon.com.br")) {
+  //   runScrap(url, () => scrapAmazon(url));
+  //}
+
 }
 
 const runner = async () => {
@@ -68,26 +69,13 @@ const runner = async () => {
 
   let list: url[] = await readCSV("./produtos.csv");
 
-  for (const item of list) {
+  list.map(async (item) => {
     try {
       await filterByStore(item.url);
-      await new Promise(resolve => setTimeout(resolve, 2000));
     } catch (e) {
-      log.error(e);
+      log.error(`Failed to process URL ${item.url}: ${e}`);
     }
-  }
+  })
 };
 
-// ... existing code ...
-
-const scheduleRunner = () => {
-  cron.schedule("*/5 * * * *", async () => {
-    try {
-      await runner();
-    } catch (e) {
-      log.error(e);
-    }
-  });
-};
-
-scheduleRunner();
+runner();

@@ -1,19 +1,12 @@
 import puppeteer from "puppeteer";
-import parseCurrencyToNumber from "./utils";
+import parseCurrencyToNumber from "../utils/utils";
+import { init_conf, user_agent } from "../config/puppeteer_conf";
 
 async function ScrapTera(url: string) {
   let title: string | undefined;
   let price: number | undefined;
 
-  const browser = await puppeteer.launch({
-    headless: true,
-    defaultViewport: null,
-    args: ["--start-maximized"],
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
-    },
-  });
+  const browser = await puppeteer.launch(init_conf);
   const page = await browser.newPage();
 
   // const url =
@@ -22,9 +15,7 @@ async function ScrapTera(url: string) {
 
   try {
     // Set user agent and headers to mimic a real browser
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36"
-    );
+    await page.setUserAgent(user_agent);
 
     // Navigate to the target page
     await page.goto(url, { waitUntil: "networkidle2" });

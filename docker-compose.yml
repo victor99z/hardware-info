@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  mongo:
+    build:
+      context: ./mongo_rs
+      args:
+        MONGO_VERSION: 6
+    environment:
+      MONGO_REPLICA_HOST: 127.0.0.1
+      MONGO_REPLICA_PORT: 27018
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_DATABASE: admin
+      # Updated to use mongosh
+      MONGO_COMMAND: "mongosh"
+    ports:
+      - "27018:27018"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          # Updated to use mongosh
+          "mongosh",
+          "admin",
+          "--port",
+          "27018",
+          "--eval",
+          "db.adminCommand('ping').ok",
+        ]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+
+volumes:
+  mongodb_data:

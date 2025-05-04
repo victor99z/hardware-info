@@ -14,7 +14,7 @@ const log = winston.createLogger({
     ),
     transports: [new winston.transports.Console({
         level: "info"
-    }), new winston.transports.File({ filename: "error.log" })],
+    }), new winston.transports.File({ filename: "./logs/latest.log" })],
 });
 
 export default log;
