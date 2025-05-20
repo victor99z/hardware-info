@@ -15,6 +15,8 @@ const runScrap = async (store, scrapFunction) => {
 };
 
 const filterByStore = async (store, item) => {
+  let random = Math.floor(Math.random() * 10000) + 1;
+  await new Promise((resolve) => setTimeout(resolve, random));
   if (!item || item.length === 0) {
     log.error("store and item empty");
     throw new Error("store and item empty");
@@ -54,6 +56,8 @@ const runner = async () => {
   let list = await db.listAllProducts();
   let res = groupByUrl(list);
 
+  log.info(JSON.stringify(res, null, 2));
+
   for (const [key, value] of Object.entries(res)) {
     const storeName = key.padEnd(30, " "); // Ajusta o comprimento do nome da loja para 30 caracteres
     const itemCount = value.length.toString().padStart(5, " "); // Ajusta o comprimento do número de itens para 5 caracteres
@@ -62,9 +66,11 @@ const runner = async () => {
   }
 };
 
-// Schedule the job to run every hour "0 * * * *"
-// every 15 minutes "*/15 * * * *"
-cron.schedule("0 * * * *", async () => {
-  log.info("Running scheduled job...");
-  await runner();
+cron.schedule("*/1 * * * *", async () => {
+  log.info("Running cron job");
+  try {
+    await runner();
+  } catch (e) {
+    log.error(e);
+  }
 });

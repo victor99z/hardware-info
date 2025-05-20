@@ -1,17 +1,22 @@
-# Use the official Node.js image as the base image
+# Use the official Puppeteer image
 FROM ghcr.io/puppeteer/puppeteer:latest
 
-# Set the working directory inside the container
+# Create and set the working directory first (as root)
+USER root
+RUN mkdir -p /app && chown pptruser:pptruser /app
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+# Switch to pptruser before copying files
+USER pptruser
+
+# Copy package files
+COPY --chown=pptruser:pptruser package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application code to the working directory
-COPY . .
+# Copy application files
+COPY --chown=pptruser:pptruser . .
 
 # Start the application
 CMD ["npm", "start"]

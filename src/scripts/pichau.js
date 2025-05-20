@@ -22,10 +22,10 @@ async function ScrapPichau(items) {
 
         // Get the price of the product
         await page
-          .waitForSelector("div.mui-1q2ojdg-price_vista")
+          .waitForSelector('div[class*="price_vista"]')
           .then(async (res) => {
             let val = await page.$$eval(
-              "div.mui-1q2ojdg-price_vista",
+              'div[class*="price_vista"]',
               (elements) => {
                 return elements.map((e) => e.textContent);
               }
@@ -33,10 +33,10 @@ async function ScrapPichau(items) {
             price_avista = parseCurrencyToNumber(val[0]);
           });
         await page
-          .waitForSelector("div.mui-1q2ojdg-price_vista")
+          .waitForSelector('div[class*="price_total"]')
           .then(async (res) => {
             let val = await page.$$eval(
-              "mui-7ie9un-price_total",
+              'div[class*="price_total"]',
               (elements) => {
                 return elements.map((e) => e.textContent);
               }
