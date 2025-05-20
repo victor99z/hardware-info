@@ -64,7 +64,7 @@ const runner = async () => {
 
 // Schedule the job to run every hour "0 * * * *"
 // every 15 minutes "*/15 * * * *"
-cron.schedule("*/10 * * * *", async () => {
+cron.schedule("0 * * * *", async () => {
   log.info("Running scheduled job...");
   await runner();
 });

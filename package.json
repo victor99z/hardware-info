@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node build/app.js",
+    "start": "node ./src/app.js",
     "test:unit": "jest --config jest.config.js",
     "build": "rimraf ./build",
     "test": "echo \"Error: no test specified\" && exit 1"
