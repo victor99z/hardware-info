@@ -4,10 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "npm run build && node build/app.js",
-    "server": "npm run build && node build/server.js",
+    "start": "node build/app.js",
     "test:unit": "jest --config jest.config.js",
-    "build": "rimraf ./build && tsc",
+    "build": "rimraf ./build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -17,24 +16,16 @@
     "@aws-sdk/client-dynamodb": "^3.705.0",
     "@aws-sdk/lib-dynamodb": "^3.705.0",
     "@prisma/client": "^6.7.0",
+    "axios": "^1.9.0",
     "csv-parser": "^3.2.0",
     "express": "^5.1.0",
     "node-cron": "^3.0.3",
+    "pocketbase": "^0.26.0",
     "prisma": "^6.7.0",
     "puppeteer": "^23.10.1",
     "sqlite3": "^5.1.7",
     "winston": "^3.17.0"
   },
-  "devDependencies": {
-    "@types/express": "^5.0.1",
-    "@types/jest": "^29.5.14",
-    "@types/node": "^22.10.1",
-    "@types/node-cron": "^3.0.11",
-    "@types/supertest": "^6.0.3",
-    "jest": "^29.7.0",
-    "rimraf": "^6.0.1",
-    "supertest": "^7.1.0",
-    "ts-jest": "^29.3.2",
-    "typescript": "^5.7.2"
-  }
+  "devDependencies": {},
+  "type": "module"
 }
