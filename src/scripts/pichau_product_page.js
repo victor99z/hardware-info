@@ -17,49 +17,70 @@ async function ScrapPichauByPage(items) {
         // Navigate to the target page
         await page.goto(item.url, { waitUntil: "networkidle2" });
 
-        const productElements = await page.$$('a[data-cy="list-product"]'); 
+        try {
+          const productElements = await page.$$('a[data-cy="list-product"]');
 
-        for (const productElement of productElements) {
-          const priceElement = await productElement.$(
-            'div[class*="price_vista"]'
-          ); // Find price within each product
+          for (const productElement of productElements) {
+            try {
+              // Extract price
+              const priceElement = await productElement.$(
+                'div[class*="price_vista"]'
+              );
+              if (!priceElement) {
+                log.error("Price element not found for a product");
+                continue; // Skip to next product instead of breaking
+              }
 
-          if (priceElement) {
-            const priceText = await page.evaluate(
-              (el) => el.textContent,
-              priceElement
-            );
+              const priceText = await page.evaluate(
+                (el) => el.textContent.trim(),
+                priceElement
+              );
+              const priceValue = parseCurrencyToNumber(priceText);
 
-            const titleElement = await productElement.$(
-              'h2[class*="product_info_title"]'
-            ); // Find title within each product
+              // Extract title
+              const titleElement = await productElement.$(
+                'h2[class*="product_info_title"]'
+              );
+              if (!titleElement) {
+                log.error("Title element not found for a product");
+                continue;
+              }
 
-            if (titleElement) {
               const titleText = await page.evaluate(
-                (el) => el.textContent,
+                (el) => el.textContent.trim(),
                 titleElement
               );
-            } else {
-              log.error("Title element not found for a product");
+
+              // Extract URL (fixed: was trying to use $('href') incorrectly)
+              const href = await productElement.evaluate((el) =>
+                el.getAttribute("href")
+              );
+              if (!href) {
+                log.error("URL not found for product");
+                continue;
+              }
+
+              // Construct full URL if needed (if href is relative)
+              const fullUrl = new URL(href, item.url).toString();
+
+              // Save to database
+              await db.createPriceRecord({
+                price: priceValue,
+                url: fullUrl,
+                title: titleText,
+              });
+
+              log.info(`Extracted: ${titleText} | ${priceValue} | ${fullUrl}`);
+            } catch (error) {
+              log.error(`Error processing product: ${error.message}`);
+              continue;
             }
-
-            const href_url = await productElement.$('href');
-              
-            db.createPriceRecord({
-              price: parseCurrencyToNumber(priceText.trim()),
-              url: href_url,
-              title: titleText.trim()
-            });
-            
-            log.info("Extracted Title:", titleText.trim()); 
-            log.info("Extracted Price:", priceText.trim());
-          } else {
-            log.error("Price element not found for a cpu");
-            break; // Exit loop if no price element is found
           }
-        }
 
-        log.info(`Scraped successfully: ${item.url}`);
+          log.info(`Successfully scraped: ${item.url}`);
+        } catch (error) {
+          log.error(`Scraping failed for ${item.url}: ${error.message}`);
+        }
       } catch (error) {
         log.error("Error scraping item: ", error);
       }
