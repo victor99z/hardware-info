@@ -5,6 +5,7 @@ import ScrapTera from "./scripts/terabyte.js";
 import scrapAmazon from "./scripts/amazon.js";
 import db from "./utils/database.js";
 import cron from "node-cron";
+import ScrapPichauByPage from "./scripts/pichau_product_page.js";
 
 const runScrap = async (store, scrapFunction) => {
   try {
@@ -69,8 +70,15 @@ const runner = async () => {
 cron.schedule("0 * * * *", async () => {
   log.info("Running cron job");
   try {
-    await runner();
+    // await runner();
   } catch (e) {
     log.error(e);
   }
 });
+
+let data = [
+  {
+    url: "https://www.pichau.com.br/hardware/placa-de-video",
+  },
+];
+await ScrapPichauByPage(data);

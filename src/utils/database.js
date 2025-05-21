@@ -32,7 +32,22 @@ async function createRecord({ id, price_avista, price_parcelado }) {
   }
 }
 
+async function createPriceRecord({ price, url, title }) {
+  try {
+    const response = await pb.collection("price_watch_whole").create({
+      price,
+      url,
+      title,
+    });
+    return response;
+  } catch (error) {
+    log.error("Error creating record:", error);
+    throw error;
+  }
+}
+
 export default {
   listAllProducts,
   createRecord,
+  createPriceRecord
 };
