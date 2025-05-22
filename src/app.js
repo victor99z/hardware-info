@@ -50,6 +50,7 @@ const filterByStore = async (store, item) => {
 // create a function to group by url
 const groupByUrl = (list) => {
   let grouped = {};
+  log.info(list);
   list.forEach((item) => {
     let store = item.url.match(/www.(.*?).com.br/);
     if (store === null) {
@@ -79,7 +80,7 @@ const runner = async () => {
   }
 };
 
-cron.schedule("0 * * * *", async () => {
+cron.schedule("*/5 * * * *", async () => {
   log.info("Running cron job");
   try {
     await runner();
