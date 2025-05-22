@@ -81,7 +81,7 @@ const runner = async () => {
   }
 };
 
-cron.schedule("*/5 * * * *", async () => {
+cron.schedule("0 * * * *", async () => {
   log.info("Running cron job");
   try {
     await runner();
