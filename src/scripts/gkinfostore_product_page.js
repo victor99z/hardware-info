@@ -68,11 +68,11 @@ async function ScrapGKINFOStoreByPage(items) {
               // const fullUrl = new URL(href, item.url).toString();
 
               //   // Save to database
-              //   await db.createPriceRecord({
-              //     price: priceValue,
-              //     url: fullUrl,
-              //     title: titleText,
-              //   });
+                await db.createPriceRecord({
+                  price: priceValue,
+                  url: fullUrl,
+                  title: titleText,
+                });
 
               log.info(`Extracted: ${hrefValue} | ${priceValue}`);
             } catch (error) {

@@ -6,6 +6,11 @@ import scrapAmazon from "./scripts/amazon.js";
 import db from "./utils/database.js";
 import cron from "node-cron";
 import ScrapPichauByPage from "./scripts/pichau_product_page.js";
+import ScrapGKINFOStoreByPage from "./scripts/gkinfostore_product_page.js";
+import ScrapTeraByPage from "./scripts/terabyte_product_page.js";
+import ScrapKabumByPage from "./scripts/kabum_product_page.js";
+import ScrapAmazonByPage from "./scripts/amazon_product_page.js";
+import ScrapPatoloucoByPage from "./scripts/patolouco_product_page.js";
 
 const runScrap = async (store, scrapFunction) => {
   try {
@@ -23,16 +28,22 @@ const filterByStore = async (store, item) => {
     throw new Error("store and item empty");
   }
   if (store.includes("www.terabyteshop.com.br")) {
-    runScrap(store, () => ScrapTera(item));
+    runScrap(store, () => ScrapTeraByPage(item));
   }
   if (store.includes("www.pichau.com.br")) {
-    runScrap(store, () => ScrapPichau(item));
+    runScrap(store, () => ScrapPichauByPage(item));
   }
   if (store.includes("www.kabum.com.br")) {
-    runScrap(store, () => ScrapKabum(item));
+    runScrap(store, () => ScrapKabumByPage(item));
   }
   if (store.includes("www.amazon.com.br")) {
-    runScrap(store, () => scrapAmazon(item));
+    runScrap(store, () => ScrapAmazonByPage(item));
+  }
+  if (store.includes("www.gkinfostore.com.br")) {
+    runScrap(store, () => ScrapGKINFOStoreByPage(item));
+  }
+  if (store.includes("www.patoloco.com.br")) {
+    runScrap(store, () => ScrapPatoloucoByPage(item));
   }
 };
 
@@ -54,7 +65,8 @@ const groupByUrl = (list) => {
 };
 
 const runner = async () => {
-  let list = await db.listAllProducts();
+  // let list = await db.listAllProducts();
+  let list = await db.listAllWholePagesUrls();
   let res = groupByUrl(list);
 
   log.info(JSON.stringify(res, null, 2));
@@ -70,7 +82,7 @@ const runner = async () => {
 cron.schedule("0 * * * *", async () => {
   log.info("Running cron job");
   try {
-    // await runner();
+    await runner();
   } catch (e) {
     log.error(e);
   }
