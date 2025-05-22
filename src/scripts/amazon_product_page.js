@@ -4,7 +4,7 @@ import { init_conf, user_agent } from "../config/puppeteer_conf.js";
 import db from "../utils/database.js";
 import log from "../config/logger.js";
 
-async function ScrapPichauByPage(items) {
+async function ScrapAmazonByPage(items) {
   const browser = await puppeteer.launch(init_conf);
   const page = await browser.newPage();
 
@@ -18,13 +18,13 @@ async function ScrapPichauByPage(items) {
         await page.goto(item.url, { waitUntil: "networkidle2" });
 
         try {
-          const productElements = await page.$$('a[data-cy="list-product"]');
+          const productElements = await page.$$('div[role="listitem"]');
 
           for (const productElement of productElements) {
             try {
               // Extract price
               const priceElement = await productElement.$(
-                'div[class*="price_vista"]'
+                'span[class*="a-price-whole"]'
               );
               if (!priceElement) {
                 log.error("Price element not found for a product");
@@ -38,9 +38,7 @@ async function ScrapPichauByPage(items) {
               const priceValue = parseCurrencyToNumber(priceText);
 
               // Extract title
-              const titleElement = await productElement.$(
-                'h2[class*="product_info_title"]'
-              );
+              const titleElement = await productElement.$("span");
               if (!titleElement) {
                 log.error("Title element not found for a product");
                 continue;
@@ -52,9 +50,8 @@ async function ScrapPichauByPage(items) {
               );
 
               // Extract URL (fixed: was trying to use $('href') incorrectly)
-              const href = await productElement.evaluate((el) =>
-                el.getAttribute("href")
-              );
+              let href = await productElement.$('a[class*="a-link-normal"]');
+              href = await page.evaluate((el) => el.getAttribute("href"), href);
               if (!href) {
                 log.error("URL not found for product");
                 continue;
@@ -70,7 +67,11 @@ async function ScrapPichauByPage(items) {
                 title: titleText,
               });
 
-              log.info(`Extracted: ${fullUrl} | ${priceValue}`);
+              console.log({
+                price: priceValue,
+                url: fullUrl,
+                title: titleText,
+              });
             } catch (error) {
               log.error(`Error processing product: ${error.message}`);
               continue;
@@ -92,4 +93,4 @@ async function ScrapPichauByPage(items) {
   }
 }
 
-export default ScrapPichauByPage;
+export default ScrapAmazonByPage;

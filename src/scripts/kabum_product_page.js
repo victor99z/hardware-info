@@ -4,7 +4,8 @@ import { init_conf, user_agent } from "../config/puppeteer_conf.js";
 import db from "../utils/database.js";
 import log from "../config/logger.js";
 
-async function ScrapPichauByPage(items) {
+// recebe uma lista de urls da loja kabum
+async function ScrapKabumByPage(items) {
   const browser = await puppeteer.launch(init_conf);
   const page = await browser.newPage();
 
@@ -15,16 +16,19 @@ async function ScrapPichauByPage(items) {
     for (const item of items) {
       try {
         // Navigate to the target page
-        await page.goto(item.url, { waitUntil: "networkidle2" });
+        const final_url =
+          item.url +
+          "?page_number=1&page_size=20000&facet_filters=&sort=most_searched";
+        await page.goto(final_url, { waitUntil: "networkidle2" });
 
         try {
-          const productElements = await page.$$('a[data-cy="list-product"]');
+          const productElements = await page.$$("article.productCard");
 
           for (const productElement of productElements) {
             try {
               // Extract price
               const priceElement = await productElement.$(
-                'div[class*="price_vista"]'
+                'span[class*="priceCard"]'
               );
               if (!priceElement) {
                 log.error("Price element not found for a product");
@@ -39,7 +43,7 @@ async function ScrapPichauByPage(items) {
 
               // Extract title
               const titleElement = await productElement.$(
-                'h2[class*="product_info_title"]'
+                'span[class*="nameCard"]'
               );
               if (!titleElement) {
                 log.error("Title element not found for a product");
@@ -52,9 +56,8 @@ async function ScrapPichauByPage(items) {
               );
 
               // Extract URL (fixed: was trying to use $('href') incorrectly)
-              const href = await productElement.evaluate((el) =>
-                el.getAttribute("href")
-              );
+              let href = await productElement.$('a[class*="productLink"]');
+              href = await page.evaluate((el) => el.getAttribute("href"), href);
               if (!href) {
                 log.error("URL not found for product");
                 continue;
@@ -70,7 +73,7 @@ async function ScrapPichauByPage(items) {
                 title: titleText,
               });
 
-              log.info(`Extracted: ${fullUrl} | ${priceValue}`);
+              log.info(`Extracted: ${fullUrl} | ${priceValue} `);
             } catch (error) {
               log.error(`Error processing product: ${error.message}`);
               continue;
@@ -85,6 +88,8 @@ async function ScrapPichauByPage(items) {
         log.error("Error scraping item: ", error);
       }
     }
+    // pause for 5 seconds to avoid overwhelming the server
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   } catch (error) {
     log.error("Error scraping item: ", error);
   } finally {
@@ -92,4 +97,4 @@ async function ScrapPichauByPage(items) {
   }
 }
 
-export default ScrapPichauByPage;
+export default ScrapKabumByPage;

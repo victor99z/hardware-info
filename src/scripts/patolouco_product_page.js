@@ -4,7 +4,7 @@ import { init_conf, user_agent } from "../config/puppeteer_conf.js";
 import db from "../utils/database.js";
 import log from "../config/logger.js";
 
-async function ScrapPichauByPage(items) {
+async function ScrapPatoloucoByPage(items) {
   const browser = await puppeteer.launch(init_conf);
   const page = await browser.newPage();
 
@@ -18,13 +18,15 @@ async function ScrapPichauByPage(items) {
         await page.goto(item.url, { waitUntil: "networkidle2" });
 
         try {
-          const productElements = await page.$$('a[data-cy="list-product"]');
+          const productElements = await page.$$("article[class*='product']");
+
+          console.log(productElements.length);
 
           for (const productElement of productElements) {
             try {
               // Extract price
               const priceElement = await productElement.$(
-                'div[class*="price_vista"]'
+                "p.price-new > span.h1"
               );
               if (!priceElement) {
                 log.error("Price element not found for a product");
@@ -37,31 +39,35 @@ async function ScrapPichauByPage(items) {
               );
               const priceValue = parseCurrencyToNumber(priceText);
 
+              // if price is nan or undefined, skip this product
+              if (isNaN(priceValue) || priceValue === undefined) {
+                continue;
+              }
+
               // Extract title
-              const titleElement = await productElement.$(
-                'h2[class*="product_info_title"]'
-              );
+              const titleElement = await productElement.$("a[href]");
               if (!titleElement) {
                 log.error("Title element not found for a product");
                 continue;
               }
 
               const titleText = await page.evaluate(
-                (el) => el.textContent.trim(),
+                (el) => el.getAttribute("title").trim(),
                 titleElement
               );
 
               // Extract URL (fixed: was trying to use $('href') incorrectly)
-              const href = await productElement.evaluate((el) =>
-                el.getAttribute("href")
+              const href = await productElement.$("a");
+
+              // get href attribute
+              const hrefValue = await page.evaluate(
+                (el) => el.getAttribute("href"),
+                href
               );
-              if (!href) {
+              if (!hrefValue) {
                 log.error("URL not found for product");
                 continue;
               }
-
-              // Construct full URL if needed (if href is relative)
-              const fullUrl = new URL(href, item.url).toString();
 
               // Save to database
               await db.createPriceRecord({
@@ -70,7 +76,7 @@ async function ScrapPichauByPage(items) {
                 title: titleText,
               });
 
-              log.info(`Extracted: ${fullUrl} | ${priceValue}`);
+              log.info(`Extracted: ${hrefValue} | ${priceValue}`);
             } catch (error) {
               log.error(`Error processing product: ${error.message}`);
               continue;
@@ -92,4 +98,4 @@ async function ScrapPichauByPage(items) {
   }
 }
 
-export default ScrapPichauByPage;
+export default ScrapPatoloucoByPage;

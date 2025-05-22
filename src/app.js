@@ -75,10 +75,3 @@ cron.schedule("0 * * * *", async () => {
     log.error(e);
   }
 });
-
-let data = [
-  {
-    url: "https://www.pichau.com.br/hardware/placa-de-video",
-  },
-];
-await ScrapPichauByPage(data);

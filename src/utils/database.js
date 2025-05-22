@@ -3,7 +3,7 @@ import PocketBase from "pocketbase";
 const pb = new PocketBase("https://pocketbase.victorbernardes.me");
 
 const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJwYmNfMzE0MjYzNTgyMyIsImV4cCI6MTc0Nzg2MzY3NCwiaWQiOiIyM2lkNGEybnR6N2Y3NzciLCJyZWZyZXNoYWJsZSI6ZmFsc2UsInR5cGUiOiJhdXRoIn0.qMq_WED6FrCOQJyyC8dSFOCz7hlbIXKgi5GXJyiToZc";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJwYmNfMzE0MjYzNTgyMyIsImV4cCI6MTc0Nzk1NjYwNSwiaWQiOiIyM2lkNGEybnR6N2Y3NzciLCJyZWZyZXNoYWJsZSI6ZmFsc2UsInR5cGUiOiJhdXRoIn0.fkz7D_xuWMiXmFZFhQaQ4KGzrW2lCfu-QVhA5G8e7o4";
 
 pb.authStore.save(token, null);
 
@@ -46,8 +46,18 @@ async function createPriceRecord({ price, url, title }) {
   }
 }
 
+async function listAllWholePagesUrls() {
+  const records = await pb.collection("whole_page_url").getFullList({
+    sort: "-created",
+    fields: "url",
+    perPage: 200,
+  });
+  return records;
+}
+
 export default {
   listAllProducts,
   createRecord,
-  createPriceRecord
+  createPriceRecord,
+  listAllWholePagesUrls,
 };
