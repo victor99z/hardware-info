@@ -53,6 +53,7 @@ const groupByUrl = (list) => {
   log.info(JSON.stringify(list));
   list.forEach((item) => {
     let store = item.url.match(/www.(.*?).com.br/);
+    console.log(`${item} -- ${store}`)
     if (store === null) {
       log.error("Store is undefined");
       throw new Error("Store is undefined");
