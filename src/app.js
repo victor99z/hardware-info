@@ -50,7 +50,7 @@ const filterByStore = async (store, item) => {
 // create a function to group by url
 const groupByUrl = (list) => {
   let grouped = {};
-  log.info(list);
+  log.info(JSON.stringify(list));
   list.forEach((item) => {
     let store = item.url.match(/www.(.*?).com.br/);
     if (store === null) {
