@@ -1,9 +1,9 @@
 import PocketBase from "pocketbase";
+import "dotenv/config";
 
 const pb = new PocketBase("https://pocketbase.victorbernardes.me");
 
-const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb2xsZWN0aW9uSWQiOiJwYmNfMzE0MjYzNTgyMyIsImV4cCI6MTc0Nzk1NjYwNSwiaWQiOiIyM2lkNGEybnR6N2Y3NzciLCJyZWZyZXNoYWJsZSI6ZmFsc2UsInR5cGUiOiJhdXRoIn0.fkz7D_xuWMiXmFZFhQaQ4KGzrW2lCfu-QVhA5G8e7o4";
+let token = process.env.PB_TOKEN;
 
 pb.authStore.save(token, null);
 

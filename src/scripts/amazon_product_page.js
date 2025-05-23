@@ -5,6 +5,8 @@ import db from "../utils/database.js";
 import log from "../config/logger.js";
 
 async function ScrapAmazonByPage(items) {
+  console.log("Scraping Amazon by page...");
+
   const browser = await puppeteer.launch(init_conf);
   const page = await browser.newPage();
 
@@ -66,12 +68,6 @@ async function ScrapAmazonByPage(items) {
                 url: fullUrl,
                 title: titleText,
               });
-
-              console.log({
-                price: priceValue,
-                url: fullUrl,
-                title: titleText,
-              });
             } catch (error) {
               log.error(`Error processing product: ${error.message}`);
               continue;
@@ -87,7 +83,7 @@ async function ScrapAmazonByPage(items) {
       }
     }
   } catch (error) {
-    log.error("Error scraping item: ", error);
+    log.error("Error scraping item: ", JSON.stringify(items));
   } finally {
     await browser.close();
   }

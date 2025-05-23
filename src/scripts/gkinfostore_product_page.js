@@ -5,6 +5,7 @@ import db from "../utils/database.js";
 import log from "../config/logger.js";
 
 async function ScrapGKINFOStoreByPage(items) {
+  console.log("Scraping GKINFOStore by page...");
   const browser = await puppeteer.launch(init_conf);
   const page = await browser.newPage();
 
@@ -68,11 +69,11 @@ async function ScrapGKINFOStoreByPage(items) {
               // const fullUrl = new URL(href, item.url).toString();
 
               //   // Save to database
-                await db.createPriceRecord({
-                  price: priceValue,
-                  url: fullUrl,
-                  title: titleText,
-                });
+              await db.createPriceRecord({
+                price: priceValue,
+                url: hrefValue,
+                title: titleText,
+              });
 
               log.info(`Extracted: ${hrefValue} | ${priceValue}`);
             } catch (error) {

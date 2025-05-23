@@ -5,6 +5,8 @@ import db from "../utils/database.js";
 import log from "../config/logger.js";
 
 async function ScrapPatoloucoByPage(items) {
+  console.log("Scraping Patolouco by page...");
+
   const browser = await puppeteer.launch(init_conf);
   const page = await browser.newPage();
 
@@ -19,8 +21,6 @@ async function ScrapPatoloucoByPage(items) {
 
         try {
           const productElements = await page.$$("article[class*='product']");
-
-          console.log(productElements.length);
 
           for (const productElement of productElements) {
             try {
@@ -72,7 +72,7 @@ async function ScrapPatoloucoByPage(items) {
               // Save to database
               await db.createPriceRecord({
                 price: priceValue,
-                url: fullUrl,
+                url: hrefValue,
                 title: titleText,
               });
 

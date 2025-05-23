@@ -14,14 +14,12 @@ let data = [
   },
 ];
 
-
-cron.schedule('*/15 * * * *', () => {
-  log.info("Init scraping...")
-  let allUrls = await db.listAllWholePagesUrls();
-  await ScrapPichauByPage(data);
-  await ScrapKabumByPage(data);
-  await ScrapTeraByPage(data);
-  await ScrapAmazonByPage(data);
-  await ScrapPatoloucoByPage(data);
-  await ScrapGKINFOStoreByPage(data);
-});
+// cron.schedule("*/15 * * * *", async () => {});
+log.info("Init scraping...");
+let allUrls = await db.listAllWholePagesUrls();
+await ScrapPichauByPage(data);
+await ScrapKabumByPage(data);
+await ScrapTeraByPage(data);
+await ScrapAmazonByPage(data);
+await ScrapPatoloucoByPage(data);
+await ScrapGKINFOStoreByPage(data);
