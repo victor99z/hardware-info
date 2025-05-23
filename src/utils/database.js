@@ -3,7 +3,7 @@ import "dotenv/config";
 
 const pb = new PocketBase("https://pocketbase.victorbernardes.me");
 
-let token = process.env.PB_TOKEN;
+const token = process.env.TOKEN;
 
 pb.authStore.save(token, null);
 
