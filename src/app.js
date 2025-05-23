@@ -24,15 +24,15 @@ const filterByStore = async (store, item) => {
     log.error("store and item empty");
     throw new Error("store and item empty");
   }
-  // if (store.includes("www.terabyteshop.com.br")) {
-  //   runScrap(store, () => ScrapTeraByPage(item));
-  // }
-  // if (store.includes("www.pichau.com.br")) {
-  //   runScrap(store, () => ScrapPichauByPage(item));
-  // }
-  // if (store.includes("www.kabum.com.br")) {
-  //   runScrap(store, () => ScrapKabumByPage(item));
-  // }
+  if (store.includes("www.terabyteshop.com.br")) {
+    runScrap(store, () => ScrapTeraByPage(item));
+  }
+  if (store.includes("www.pichau.com.br")) {
+    runScrap(store, () => ScrapPichauByPage(item));
+  }
+  if (store.includes("www.kabum.com.br")) {
+    runScrap(store, () => ScrapKabumByPage(item));
+  }
   if (store.includes("www.amazon.com.br")) {
     await runScrap(store, () => ScrapAmazonByPage(item));
   }
@@ -72,7 +72,7 @@ const runner = async () => {
   }
 };
 
-cron.schedule("0 * * * *", async () => {
+cron.schedule("*/5 * * * *", async () => {
   log.info("Running cron job");
   try {
     await runner();
