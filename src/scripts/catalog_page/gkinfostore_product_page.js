@@ -1,12 +1,11 @@
 import puppeteer from "puppeteer";
-import parseCurrencyToNumber from "../utils/utils.js";
-import { init_conf, user_agent } from "../config/puppeteer_conf.js";
-import db from "../utils/database.js";
-import log from "../config/logger.js";
+import parseCurrencyToNumber from "../../utils/utils.js";
+import { init_conf, user_agent } from "../../config/puppeteer_conf.js";
+import db from "../../utils/database.js";
+import log from "../../config/logger.js";
 
-async function ScrapPatoloucoByPage(items) {
-  console.log("Scraping Patolouco by page...");
-
+async function ScrapGKINFOStoreByPage(items) {
+  console.log("Scraping GKINFOStore by page...");
   const browser = await puppeteer.launch(init_conf);
   const page = await browser.newPage();
 
@@ -20,13 +19,13 @@ async function ScrapPatoloucoByPage(items) {
         await page.goto(item.url, { waitUntil: "networkidle2" });
 
         try {
-          const productElements = await page.$$("article[class*='product']");
+          const productElements = await page.$$("div.listagem-item");
 
           for (const productElement of productElements) {
             try {
               // Extract price
               const priceElement = await productElement.$(
-                "p.price-new > span.h1"
+                'span[class*="desconto-a-vista"]'
               );
               if (!priceElement) {
                 log.error("Price element not found for a product");
@@ -39,13 +38,10 @@ async function ScrapPatoloucoByPage(items) {
               );
               const priceValue = parseCurrencyToNumber(priceText);
 
-              // if price is nan or undefined, skip this product
-              if (isNaN(priceValue) || priceValue === undefined) {
-                continue;
-              }
-
               // Extract title
-              const titleElement = await productElement.$("a[href]");
+              const titleElement = await productElement.$(
+                'a[class*="produto-sobrepor"]'
+              );
               if (!titleElement) {
                 log.error("Title element not found for a product");
                 continue;
@@ -57,7 +53,7 @@ async function ScrapPatoloucoByPage(items) {
               );
 
               // Extract URL (fixed: was trying to use $('href') incorrectly)
-              const href = await productElement.$("a");
+              const href = await productElement.$("div.info-produto > a");
 
               // get href attribute
               const hrefValue = await page.evaluate(
@@ -69,7 +65,10 @@ async function ScrapPatoloucoByPage(items) {
                 continue;
               }
 
-              // Save to database
+              // // Construct full URL if needed (if href is relative)
+              // const fullUrl = new URL(href, item.url).toString();
+
+              //   // Save to database
               await db.createPriceRecord({
                 price: priceValue,
                 url: hrefValue,
@@ -98,4 +97,4 @@ async function ScrapPatoloucoByPage(items) {
   }
 }
 
-export default ScrapPatoloucoByPage;
+export default ScrapGKINFOStoreByPage;

@@ -1,8 +1,8 @@
 import puppeteer from "puppeteer";
-import parseCurrencyToNumber from "../utils/utils.js";
-import { init_conf, user_agent } from "../config/puppeteer_conf.js";
-import db from "../utils/database.js";
-import log from "../config/logger.js";
+import parseCurrencyToNumber from "../../utils/utils.js";
+import { init_conf, user_agent } from "../../config/puppeteer_conf.js";
+import db from "../../utils/database.js";
+import log from "../../config/logger.js";
 
 async function ScrapKabum(items) {
   let price_avista;

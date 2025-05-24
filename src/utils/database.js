@@ -7,17 +7,6 @@ const token = process.env.PB_TOKEN;
 
 pb.authStore.save(token, null);
 
-async function listAllProducts() {
-  // you can also fetch all records at once via getFullList
-  const records = await pb.collection("product").getFullList({
-    sort: "-created",
-    fields: "id,url",
-    filter: "active=true",
-    perPage: 200,
-  });
-  return records;
-}
-
 async function createRecord({ id, price_avista, price_parcelado }) {
   try {
     const response = await pb.collection("price_tracker").create({
@@ -34,7 +23,7 @@ async function createRecord({ id, price_avista, price_parcelado }) {
 
 async function createPriceRecord({ price, url, title }) {
   try {
-    const response = await pb.collection("price_watch_whole").create({
+    const response = await pb.collection("tracker_gpu").create({
       price,
       url,
       title,
@@ -46,8 +35,8 @@ async function createPriceRecord({ price, url, title }) {
   }
 }
 
-async function listAllWholePagesUrls() {
-  const records = await pb.collection("whole_page_url").getFullList({
+async function listAllUrlsFromGPU() {
+  const records = await pb.collection("url_gpu").getFullList({
     sort: "-created",
     fields: "url",
     perPage: 200,
@@ -55,9 +44,27 @@ async function listAllWholePagesUrls() {
   return records;
 }
 
+async function listAll({ filter, sort, fields, perPage }) {
+  const records = await pb
+    .collection("tracker_gpu")
+    .getFullList({ filter, sort, fields });
+  return records;
+}
+
+async function updateRecord({ id, data }) {
+  try {
+    const response = await pb.collection("tracker_gpu").update(id, data);
+    return response;
+  } catch (error) {
+    log.error("Error updating record:", error);
+    throw error;
+  }
+}
+
 export default {
-  listAllProducts,
   createRecord,
   createPriceRecord,
-  listAllWholePagesUrls,
+  listAllUrlsFromGPU,
+  listAll,
+  updateRecord,
 };

@@ -1,12 +1,11 @@
 import puppeteer from "puppeteer";
-import parseCurrencyToNumber from "../utils/utils.js";
-import { init_conf, user_agent } from "../config/puppeteer_conf.js";
-import db from "../utils/database.js";
-import log from "../config/logger.js";
+import parseCurrencyToNumber from "../../utils/utils.js";
+import { init_conf, user_agent } from "../../config/puppeteer_conf.js";
+import db from "../../utils/database.js";
+import log from "../../config/logger.js";
 
-async function ScrapAmazonByPage(items) {
-  console.log("Scraping Amazon by page...");
-
+// recebe uma lista de urls da loja kabum
+async function ScrapKabumByPage(items) {
   const browser = await puppeteer.launch(init_conf);
   const page = await browser.newPage();
 
@@ -17,16 +16,19 @@ async function ScrapAmazonByPage(items) {
     for (const item of items) {
       try {
         // Navigate to the target page
-        await page.goto(item.url, { waitUntil: "networkidle2" });
+        const final_url =
+          item.url +
+          "?page_number=1&page_size=20000&facet_filters=&sort=most_searched";
+        await page.goto(final_url, { waitUntil: "networkidle2" });
 
         try {
-          const productElements = await page.$$('div[role="listitem"]');
+          const productElements = await page.$$("article.productCard");
 
           for (const productElement of productElements) {
             try {
               // Extract price
               const priceElement = await productElement.$(
-                'span[class*="a-price-whole"]'
+                'span[class*="priceCard"]'
               );
               if (!priceElement) {
                 log.error("Price element not found for a product");
@@ -40,7 +42,9 @@ async function ScrapAmazonByPage(items) {
               const priceValue = parseCurrencyToNumber(priceText);
 
               // Extract title
-              const titleElement = await productElement.$("span");
+              const titleElement = await productElement.$(
+                'span[class*="nameCard"]'
+              );
               if (!titleElement) {
                 log.error("Title element not found for a product");
                 continue;
@@ -52,7 +56,7 @@ async function ScrapAmazonByPage(items) {
               );
 
               // Extract URL (fixed: was trying to use $('href') incorrectly)
-              let href = await productElement.$('a[class*="a-link-normal"]');
+              let href = await productElement.$('a[class*="productLink"]');
               href = await page.evaluate((el) => el.getAttribute("href"), href);
               if (!href) {
                 log.error("URL not found for product");
@@ -68,6 +72,8 @@ async function ScrapAmazonByPage(items) {
                 url: fullUrl,
                 title: titleText,
               });
+
+              log.info(`Extracted: ${fullUrl} | ${priceValue} `);
             } catch (error) {
               log.error(`Error processing product: ${error.message}`);
               continue;
@@ -82,11 +88,13 @@ async function ScrapAmazonByPage(items) {
         log.error("Error scraping item: ", error);
       }
     }
+    // pause for 5 seconds to avoid overwhelming the server
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   } catch (error) {
-    log.error("Error scraping item: ", JSON.stringify(items));
+    log.error("Error scraping item: ", error);
   } finally {
     await browser.close();
   }
 }
 
-export default ScrapAmazonByPage;
+export default ScrapKabumByPage;

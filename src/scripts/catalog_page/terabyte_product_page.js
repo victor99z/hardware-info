@@ -1,11 +1,10 @@
 import puppeteer from "puppeteer";
-import parseCurrencyToNumber from "../utils/utils.js";
-import { init_conf, user_agent } from "../config/puppeteer_conf.js";
-import db from "../utils/database.js";
-import log from "../config/logger.js";
+import parseCurrencyToNumber from "../../utils/utils.js";
+import { init_conf, user_agent } from "../../config/puppeteer_conf.js";
+import db from "../../utils/database.js";
+import log from "../../config/logger.js";
 
-// recebe uma lista de urls da loja kabum
-async function ScrapKabumByPage(items) {
+async function ScrapTeraByPage(items) {
   const browser = await puppeteer.launch(init_conf);
   const page = await browser.newPage();
 
@@ -16,19 +15,16 @@ async function ScrapKabumByPage(items) {
     for (const item of items) {
       try {
         // Navigate to the target page
-        const final_url =
-          item.url +
-          "?page_number=1&page_size=20000&facet_filters=&sort=most_searched";
-        await page.goto(final_url, { waitUntil: "networkidle2" });
+        await page.goto(item.url, { waitUntil: "networkidle2" });
 
         try {
-          const productElements = await page.$$("article.productCard");
+          const productElements = await page.$$("div.product-item");
 
           for (const productElement of productElements) {
             try {
               // Extract price
               const priceElement = await productElement.$(
-                'span[class*="priceCard"]'
+                'div[class*="product-item__new-price"] > span'
               );
               if (!priceElement) {
                 log.error("Price element not found for a product");
@@ -43,7 +39,7 @@ async function ScrapKabumByPage(items) {
 
               // Extract title
               const titleElement = await productElement.$(
-                'span[class*="nameCard"]'
+                'a[class*="product-item__name"]'
               );
               if (!titleElement) {
                 log.error("Title element not found for a product");
@@ -51,12 +47,14 @@ async function ScrapKabumByPage(items) {
               }
 
               const titleText = await page.evaluate(
-                (el) => el.textContent.trim(),
+                (el) => el.getAttribute("title").trim(),
                 titleElement
               );
 
               // Extract URL (fixed: was trying to use $('href') incorrectly)
-              let href = await productElement.$('a[class*="productLink"]');
+              let href = await productElement.$(
+                'a[class*="product-item__name"]'
+              );
               href = await page.evaluate((el) => el.getAttribute("href"), href);
               if (!href) {
                 log.error("URL not found for product");
@@ -73,7 +71,7 @@ async function ScrapKabumByPage(items) {
                 title: titleText,
               });
 
-              log.info(`Extracted: ${fullUrl} | ${priceValue} `);
+              log.info(`Extracted: ${fullUrl} | ${priceValue}`);
             } catch (error) {
               log.error(`Error processing product: ${error.message}`);
               continue;
@@ -88,8 +86,6 @@ async function ScrapKabumByPage(items) {
         log.error("Error scraping item: ", error);
       }
     }
-    // pause for 5 seconds to avoid overwhelming the server
-    await new Promise((resolve) => setTimeout(resolve, 5000));
   } catch (error) {
     log.error("Error scraping item: ", error);
   } finally {
@@ -97,4 +93,4 @@ async function ScrapKabumByPage(items) {
   }
 }
 
-export default ScrapKabumByPage;
+export default ScrapTeraByPage;

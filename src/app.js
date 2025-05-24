@@ -1,12 +1,12 @@
 import log from "./config/logger.js";
 import db from "./utils/database.js";
 import cron from "node-cron";
-import ScrapPichauByPage from "./scripts/pichau_product_page.js";
-import ScrapGKINFOStoreByPage from "./scripts/gkinfostore_product_page.js";
-import ScrapTeraByPage from "./scripts/terabyte_product_page.js";
-import ScrapKabumByPage from "./scripts/kabum_product_page.js";
-import ScrapAmazonByPage from "./scripts/amazon_product_page.js";
-import ScrapPatoloucoByPage from "./scripts/patolouco_product_page.js";
+import ScrapPichauByPage from "./scripts/catalog_page/pichau_product_page.js";
+import ScrapGKINFOStoreByPage from "./scripts/catalog_page/gkinfostore_product_page.js";
+import ScrapTeraByPage from "./scripts/catalog_page/terabyte_product_page.js";
+import ScrapKabumByPage from "./scripts/catalog_page/kabum_product_page.js";
+import ScrapAmazonByPage from "./scripts/catalog_page/amazon_product_page.js";
+import ScrapPatoloucoByPage from "./scripts/catalog_page/patolouco_product_page.js";
 import "dotenv/config";
 
 const runScrap = async (store, scrapFunction) => {
@@ -63,7 +63,7 @@ const groupByUrl = (list) => {
 
 const runner = async () => {
   // let list = await db.listAllProducts();
-  let list = await db.listAllWholePagesUrls();
+  let list = await db.listAllUrlsFromGPU();
   let res = groupByUrl(list);
   for (const [key, value] of Object.entries(res)) {
     const storeName = key.padEnd(30, " "); // Ajusta o comprimento do nome da loja para 30 caracteres
