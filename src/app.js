@@ -24,24 +24,24 @@ const filterByStore = async (store, item) => {
     log.error("store and item empty");
     throw new Error("store and item empty");
   }
-  // if (store.includes("www.terabyteshop.com.br")) {
-  //   runScrap(store, () => ScrapTeraByPage(item));
-  // }
+  if (store.includes("www.terabyteshop.com.br")) {
+    runScrap(store, () => ScrapTeraByPage(item));
+  }
   if (store.includes("www.pichau.com.br")) {
     runScrap(store, () => ScrapPichauByPage(item));
   }
-  // if (store.includes("www.kabum.com.br")) {
-  //   runScrap(store, () => ScrapKabumByPage(item));
-  // }
-  // if (store.includes("www.amazon.com.br")) {
-  //   await runScrap(store, () => ScrapAmazonByPage(item));
-  // }
-  // if (store.includes("www.gkinfostore.com.br")) {
-  //   await runScrap(store, () => ScrapGKINFOStoreByPage(item));
-  // }
-  // if (store.includes("www.patoloco.com.br")) {
-  //   await runScrap(store, () => ScrapPatoloucoByPage(item));
-  //}
+  if (store.includes("www.kabum.com.br")) {
+    runScrap(store, () => ScrapKabumByPage(item));
+  }
+  if (store.includes("www.amazon.com.br")) {
+    await runScrap(store, () => ScrapAmazonByPage(item));
+  }
+  if (store.includes("www.gkinfostore.com.br")) {
+    await runScrap(store, () => ScrapGKINFOStoreByPage(item));
+  }
+  if (store.includes("www.patoloco.com.br")) {
+    await runScrap(store, () => ScrapPatoloucoByPage(item));
+  }
 };
 
 // create a function to group by url
@@ -72,12 +72,12 @@ const runner = async () => {
   }
 };
 
-// cron.schedule("0 * * * *", async () => {
-//   log.info("Running cron job");
-//   try {
-//     await runner();
-//   } catch (e) {
-//     log.error(e);
-//   }
-// });
-await runner();
+cron.schedule("0 * * * *", async () => {
+  log.info("Running cron job");
+  try {
+    await runner();
+  } catch (e) {
+    log.error(e);
+  }
+});
+// await runner();
