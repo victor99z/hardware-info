@@ -15,7 +15,7 @@ async function ScrapPichauByPage(items) {
 
   try {
     for (const item of items) {
-      while (query_page != -1) {
+      while (query_page <= 4) {
         query_page++;
         try {
           // Navigate to the target page
