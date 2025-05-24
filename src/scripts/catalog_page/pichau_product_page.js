@@ -25,6 +25,12 @@ async function ScrapPichauByPage(items) {
           });
 
           try {
+            await page
+              .waitForSelector('a[data-cy="list-product"]')
+              .catch(() => {
+                log.error("Selector not found, skipping page...");
+              });
+
             const productElements = await page.$$('a[data-cy="list-product"]');
 
             for (const productElement of productElements) {
